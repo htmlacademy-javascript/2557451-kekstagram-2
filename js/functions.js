@@ -1,5 +1,5 @@
 function validateStroke(stroke, maxLength) {
-  return stroke.length >= maxLength;
+  return maxLength === stroke.length;
 }
 
 function validatePalindrom(word) {
@@ -8,10 +8,10 @@ function validatePalindrom(word) {
   let reversedWord = '';
 
   for (let i = downRegister.length - 1; i >= 0; i--) {
-    reversedWord += word[i]
+    reversedWord += downRegister[i]
   }
 
-  return reversedWord === word;
+  return reversedWord === downRegister;
 }
 
 function getSomething (symbols) {
@@ -24,15 +24,12 @@ function getSomething (symbols) {
       getNum += num;
     }
   }
-  if (getNum.length === 0) {
-    return NaN;
-  } else {
-    return getNum;
-  }
+
+  return getNum || NaN;
 }
 
 console.log(validateStroke('привет', 6));
-console.log(validatePalindrom('топот'));
-console.log(getSomething('а я-9. томат7869+01'));
+console.log(validatePalindrom('ДовОд'));
+console.log(getSomething('я томат'));
 
 

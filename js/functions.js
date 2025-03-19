@@ -3,12 +3,12 @@ function validateStroke(stroke, maxLength) {
 }
 
 function validatePalindrom(word) {
-  let wordWithoutSpace = word.replaceAll(' ', '');
-  let downRegister = wordWithoutSpace.toLowerCase();
+  const wordWithoutSpace = word.replaceAll(' ', '');
+  const downRegister = wordWithoutSpace.toLowerCase();
   let reversedWord = '';
 
   for (let i = downRegister.length - 1; i >= 0; i--) {
-    reversedWord += downRegister[i]
+    reversedWord += downRegister[i];
   }
 
   return reversedWord === downRegister;
@@ -18,7 +18,7 @@ function getSomething (symbols) {
   let getNum = '';
 
   for (let i = 0; i <= symbols.length ; i++) {
-    let num = parseInt(symbols[i]);
+    const num = parseInt(symbols[i]);
 
     if (!isNaN(num)) {
       getNum += num;
@@ -27,9 +27,3 @@ function getSomething (symbols) {
 
   return getNum || NaN;
 }
-
-console.log(validateStroke('привет', 6));
-console.log(validatePalindrom('ДовОд'));
-console.log(getSomething('я томат'));
-
-

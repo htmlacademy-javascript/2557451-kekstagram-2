@@ -1,6 +1,7 @@
-import { PHOTO_LIST } from './rendering_thumbnails.js';
-import { initializeGallery } from './imageViewer.js';
+import { loadPhotos } from './rendering-thumbnails.js';
+import { initializeGallery } from './image-viewer.js';
 
+// Константы
 const FILTERS_CONTAINER = document.querySelector('.img-filters');
 const FILTER_DEFAULT = FILTERS_CONTAINER.querySelector('#filter-default');
 const FILTER_RANDOM = FILTERS_CONTAINER.querySelector('#filter-random');
@@ -8,46 +9,50 @@ const FILTER_DISCUSSED = FILTERS_CONTAINER.querySelector('#filter-discussed');
 
 const CONTENT_AREA = document.querySelector('.pictures');
 const RANDOM_PHOTO_COUNT = 10;
+const DEBOUNCE_DELAY = 500;
+
 let photos = [];
 let debounceTimer;
 
+// debounce функция
 const debounce = (callback, delay) => {
   return (...args) => {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      callback(...args);
-    }, delay);
+    debounceTimer = setTimeout(() => callback(...args), delay);
   };
 };
 
+// Очистка фотографий
 const clearPhotos = () => {
-  CONTENT_AREA.querySelectorAll('.picture').forEach((img) => img.remove());
+  CONTENT_AREA.querySelectorAll('.picture').forEach((image) => image.remove());
 };
 
+// Рендеринг фотографий
 const renderPhotos = (filteredPhotos) => {
   clearPhotos();
-  const TEMPLATE_PHOTOS = document.querySelector('#picture').content;
-  const PHOTO_TEMPLATE = TEMPLATE_PHOTOS.querySelector('.picture');
-  const FRAGMENT = document.createDocumentFragment();
+  const templatePhotos = document.querySelector('#picture').content;
+  const photoTemplate = templatePhotos.querySelector('.picture');
+  const fragment = document.createDocumentFragment();
 
-  filteredPhotos.forEach((element) => {
-    const cloneTemplatePhotos = PHOTO_TEMPLATE.cloneNode(true);
-    const getImageTag = cloneTemplatePhotos.querySelector('.picture__img');
-    const getPictureCommentTag = cloneTemplatePhotos.querySelector('.picture__comments');
-    const getPictureLikesTag = cloneTemplatePhotos.querySelector('.picture__likes');
+  filteredPhotos.forEach(({ url, description, comments, likes }) => {
+    const clonedTemplate = photoTemplate.cloneNode(true);
+    const imageTag = clonedTemplate.querySelector('.picture__img');
+    const commentsTag = clonedTemplate.querySelector('.picture__comments');
+    const likesTag = clonedTemplate.querySelector('.picture__likes');
 
-    getImageTag.src = element.url;
-    getImageTag.alt = element.description;
-    getPictureCommentTag.textContent = element.comments.length;
-    getPictureLikesTag.textContent = element.likes;
+    imageTag.src = url;
+    imageTag.alt = description;
+    commentsTag.textContent = comments.length;
+    likesTag.textContent = likes;
 
-    FRAGMENT.appendChild(cloneTemplatePhotos);
+    fragment.appendChild(clonedTemplate);
   });
 
-  CONTENT_AREA.append(FRAGMENT);
+  CONTENT_AREA.append(fragment);
   initializeGallery(filteredPhotos); // Привязка обработчиков кликов
 };
 
+// Применение фильтра
 const applyFilter = debounce((filter) => {
   let filteredPhotos = [];
 
@@ -75,10 +80,11 @@ const applyFilter = debounce((filter) => {
   } else {
     FILTER_DEFAULT.classList.add('img-filters__button--active');
   }
-}, 500); // Установка задержки в 500 мс
+}, DEBOUNCE_DELAY);
 
+// Активация фильтров
 const activateFilters = async () => {
-  photos = await PHOTO_LIST();
+  photos = await loadPhotos();
 
   FILTERS_CONTAINER.classList.remove('img-filters--inactive');
 

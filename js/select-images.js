@@ -1,21 +1,33 @@
-// Константы
+// === Константы ===
+
+// Радиокнопки с эффектами
 const EFFECT_RADIO_ELEMENTS = document.querySelectorAll('.effects__radio');
+
+// Превью изображения, на которое применяются эффекты
 const IMAGE_PREVIEW_ELEMENT = document.querySelector('.img-upload__preview img');
 
-// Функции
-const handleEffectChange = (evt) => {
-  const selectedEffect = evt.target.value;
-  IMAGE_PREVIEW_ELEMENT.className = ''; // Сбросить все классы
+// === Функции ===
 
+// Применение выбранного эффекта
+const handleEffectChange = (event) => {
+  const selectedEffect = event.target.value;
+
+  // Удаляем все предыдущие классы
+  IMAGE_PREVIEW_ELEMENT.className = '';
+
+  // Добавляем новый класс, если эффект выбран
   if (selectedEffect !== 'none') {
     IMAGE_PREVIEW_ELEMENT.classList.add(`effects__preview--${selectedEffect}`);
   }
 };
 
-// Подключение обработчика событий
-EFFECT_RADIO_ELEMENTS.forEach((radioElement) => {
-  radioElement.addEventListener('change', handleEffectChange);
+// === Инициализация ===
+
+// Назначаем обработчик для каждого переключателя
+EFFECT_RADIO_ELEMENTS.forEach((radio) => {
+  radio.addEventListener('change', handleEffectChange);
 });
 
-// Экспортируем неизменяемую переменную
+// === Экспорт ===
+
 export { IMAGE_PREVIEW_ELEMENT };

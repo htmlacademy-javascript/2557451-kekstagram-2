@@ -1,71 +1,87 @@
-// Константы
+// === DOM-элементы ===
 const sliderElement = document.querySelector('.effect-level__slider');
 const effectFieldElement = document.querySelector('.img-upload__effect-level');
 const effectRadios = document.querySelectorAll('.effects__radio');
 const applyingEffectImage = document.querySelector('.img-upload__preview img');
+const effectValueElement = document.querySelector('.effect-level__value');
 
-// Фильтры эффектов
+// === Фильтры ===
 const effectFilters = {
   chrome: (value) => `grayscale(${value})`,
   sepia: (value) => `sepia(${value})`,
   marvin: (value) => `invert(${value}%)`,
   phobos: (value) => `blur(${value}px)`,
-  heat: (value) => `brightness(${value})`
+  heat: (value) => `brightness(${value})`,
 };
 
-// Настройки слайдера для разных эффектов
-const sliderOptions = {
+// === Настройки слайдера ===
+const sliderSettings = {
   chrome: { min: 0, max: 1, step: 0.1, start: 1 },
   sepia: { min: 0, max: 1, step: 0.1, start: 1 },
   marvin: { min: 0, max: 100, step: 1, start: 100 },
   phobos: { min: 0, max: 3, step: 0.1, start: 3 },
-  heat: { min: 1, max: 3, step: 0.1, start: 3 }
+  heat: { min: 1, max: 3, step: 0.1, start: 3 },
 };
 
-// Обновление настроек слайдера в зависимости от эффекта
+// === Обновление слайдера под выбранный эффект ===
 const updateSlider = (effect) => {
-  if (effect in sliderOptions) {
-    sliderElement.noUiSlider.updateOptions({
-      range: { min: sliderOptions[effect].min, max: sliderOptions[effect].max },
-      start: sliderOptions[effect].start,
-      step: sliderOptions[effect].step
-    });
-  }
+  if (!sliderSettings[effect]) return;
+
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: sliderSettings[effect].min,
+      max: sliderSettings[effect].max,
+    },
+    start: sliderSettings[effect].start,
+    step: sliderSettings[effect].step,
+  });
 };
 
-// Обработчик изменения эффекта
-const onEffectChange = (event) => {
-  const selectedEffect = event.target.id.replace('effect-', '');
-  if (selectedEffect === 'none') {
-    effectFieldElement.classList.add('visually-hidden');
-    applyingEffectImage.style.filter = '';
-  } else {
-    effectFieldElement.classList.remove('visually-hidden');
-    updateSlider(selectedEffect);
-  }
-};
-
-// Установка обработчиков изменения эффекта
-effectRadios.forEach((radio) => {
-  radio.addEventListener('change', onEffectChange);
-});
-
-// Создание слайдера
-noUiSlider.create(sliderElement, {
-  range: { min: 0, max: 100 },
-  start: 1,
-  step: 1,
-  connect: 'lower',
-});
-
-// Обработчик для обновления эффекта на изображении
+// === Применение фильтра при изменении значения слайдера ===
 const onSliderUpdate = () => {
-  const selectedRadio = document.querySelector('.effects__radio:checked').id.replace('effect-', '');
-  const effectValue = sliderElement.noUiSlider.get();
-  applyingEffectImage.style.filter = effectFilters[selectedRadio] ? effectFilters[selectedRadio](effectValue) : '';
+  const effect = document.querySelector('.effects__radio:checked')?.id.replace('effect-', '');
+  const value = sliderElement.noUiSlider.get();
+
+  applyingEffectImage.style.filter = effectFilters[effect]?.(value) || '';
+  effectValueElement.value = parseFloat(value); // Убираем лишние нули
 };
 
-// Добавление обработчика для слайдера
-sliderElement.noUiSlider.on('update', onSliderUpdate);
+// === Обработка смены эффекта ===
+const onEffectChange = (event) => {
+  const effect = event.target.id.replace('effect-', '');
 
-export { effectFieldElement, applyingEffectImage };
+  if (effect === 'none') {
+    applyingEffectImage.style.filter = '';
+    effectFieldElement.classList.add('visually-hidden');
+  } else {
+    updateSlider(effect);
+    effectFieldElement.classList.remove('visually-hidden');
+  }
+};
+
+// === Инициализация слайдера ===
+if (!sliderElement.noUiSlider) {
+  noUiSlider.create(sliderElement, {
+    range: { min: 0, max: 100 },
+    start: 1,
+    step: 1,
+    connect: 'lower',
+  });
+}
+
+effectFieldElement.classList.add('visually-hidden');
+
+// === Обработчики ===
+sliderElement.noUiSlider.on('update', onSliderUpdate);
+effectRadios.forEach((radio) => radio.addEventListener('change', onEffectChange));
+
+// === Сброс эффектов ===
+const resetEffects = () => {
+  document.querySelector('#effect-none').checked = true;
+  applyingEffectImage.style.filter = '';
+  effectFieldElement.classList.add('visually-hidden');
+  sliderElement.noUiSlider.set(1);
+  effectValueElement.value = '';
+};
+
+export { effectFieldElement, applyingEffectImage, resetEffects };

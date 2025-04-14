@@ -1,92 +1,92 @@
-// Импорты
-import { photoUploadFormElement, pristineValidator } from './validate-form.js'; // Импорт формы и валидации
-import { uploadOverlay } from './image-upload-modal.js'; // Импорт переменной модального окна
+// === Импорт зависимостей ===
+import { photoUploadFormElement, pristineValidator } from './validate-form.js';
+import { uploadOverlay } from './image-upload-modal.js';
 
-// Константы
-const SUCCESS_TEMPLATE = document.querySelector('#success').content.querySelector('.success');
-const ERROR_TEMPLATE = document.querySelector('#error').content.querySelector('.error');
-const SUBMIT_BUTTON = document.querySelector('.img-upload__submit');
-const ESC_KEY = 'Escape'; // Константа для клавиши ESC
+// === Константы ===
+const SUCCESS_MESSAGE_TEMPLATE = document.querySelector('#success').content.querySelector('.success');
+const ERROR_MESSAGE_TEMPLATE = document.querySelector('#error').content.querySelector('.error');
+const submitButton = document.querySelector('.img-upload__submit');
+const ESC_KEY = 'Escape';
 
-// Блокировка кнопки "Отправить"
-const blockSubmitButton = () => {
-  SUBMIT_BUTTON.disabled = true;
+// === Управление кнопкой отправки ===
+const disableSubmitButton = () => {
+  submitButton.disabled = true;
 };
 
-// Разблокировка кнопки "Отправить"
-const unblockSubmitButton = () => {
-  SUBMIT_BUTTON.disabled = false;
+const enableSubmitButton = () => {
+  submitButton.disabled = false;
 };
 
-// Закрытие формы загрузки изображения
+// === Закрытие формы загрузки ===
 const closeUploadForm = () => {
-  photoUploadFormElement.reset(); // Сбрасываем форму
-  pristineValidator.reset(); // Сбрасываем валидацию
-  uploadOverlay.classList.add('hidden');
+  photoUploadFormElement.reset();         // Сброс значений формы
+  pristineValidator.reset();              // Сброс валидации
+  uploadOverlay.classList.add('hidden');  // Скрытие модального окна
 };
 
-// Функция показа сообщений
+// === Показ сообщения (успех или ошибка) ===
 const showMessage = (template) => {
-  const messageElement = template.cloneNode(true);
-  document.body.append(messageElement);
+  const message = template.cloneNode(true);
+  document.body.appendChild(message);
 
   const closeMessage = () => {
-    messageElement.remove();
-    document.body.classList.remove('modal-open'); // Удаляем класс 'modal-open'
-    document.removeEventListener('keydown', onEscPress); // Убираем обработчик
-    document.removeEventListener('click', onOutsideClick); // Убираем обработчик
+    message.remove();
+    document.body.classList.remove('modal-open');
+    document.removeEventListener('keydown', onEscPress);
+    document.removeEventListener('click', onOutsideClick);
   };
 
-  // Обработчик закрытия по клавише ESC
   const onEscPress = (evt) => {
-    if (evt.key === ESC_KEY) {
-      closeMessage();
-    }
+    if (evt.key === ESC_KEY) closeMessage();
   };
 
-  // Обработчик закрытия по клику вне сообщения
   const onOutsideClick = (evt) => {
-    if (!messageElement.querySelector('div').contains(evt.target)) {
-      closeMessage();
-    }
+    const innerBox = message.querySelector('div');
+    if (innerBox && !innerBox.contains(evt.target)) closeMessage();
   };
 
-  // Добавляем текст и слушатель событий
-  messageElement.querySelector('button').textContent = 'Close'; // Защита от XSS
-  messageElement.querySelector('button').addEventListener('click', closeMessage); // Закрытие по кнопке
-  document.addEventListener('keydown', onEscPress); // Слушаем клавишу ESC
-  document.addEventListener('click', onOutsideClick); // Слушаем клик вне окна
+  const closeButton = message.querySelector('button');
+  if (closeButton) {
+    closeButton.textContent = 'Close';
+    closeButton.addEventListener('click', closeMessage);
+  } else {
+    console.warn('Кнопка закрытия не найдена в шаблоне сообщения!');
+  }
+
+  document.addEventListener('keydown', onEscPress);
+  document.addEventListener('click', onOutsideClick);
 };
 
-// Обработчик отправки формы
-const onFormSubmit = (evt) => {
+// === Обработка отправки формы ===
+const handleFormSubmit = async (evt) => {
   evt.preventDefault();
 
-  if (!pristineValidator.validate()) return; // Проверка валидности формы
+  const isValid = pristineValidator.validate();
+  if (!isValid) return;
 
-  blockSubmitButton(); // Блокируем кнопку
+  disableSubmitButton();
 
-  const formData = new FormData(photoUploadFormElement); // Формируем данные формы
+  const formData = new FormData(photoUploadFormElement);
 
-  fetch('https://31.javascript.htmlacademy.pro/kekstagram', {
-    method: 'POST',
-    body: formData
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Ошибка при отправке данных');
-      }
-      closeUploadForm(); // Закрываем форму
-      showMessage(SUCCESS_TEMPLATE); // Показываем сообщение об успехе
-    })
-    .catch((error) => {
-      console.error('Ошибка при отправке данных:', error); // Логируем ошибку
-      showMessage(ERROR_TEMPLATE); // Показываем сообщение об ошибке
-    })
-    .finally(() => {
-      unblockSubmitButton(); // Разблокируем кнопку
+  try {
+    const response = await fetch('https://31.javascript.htmlacademy.pro/kekstagram/', {
+      method: 'POST',
+      body: formData
     });
+
+    if (!response.ok) {
+      throw new Error('Ошибка при отправке данных');
+    }
+
+    closeUploadForm();
+    showMessage(SUCCESS_MESSAGE_TEMPLATE);
+  } catch (error) {
+    console.error('Ошибка при отправке:', error);
+    showMessage(ERROR_MESSAGE_TEMPLATE);
+  } finally {
+    enableSubmitButton();
+  }
 };
 
-// Подключение обработчика отправки формы
-photoUploadFormElement.addEventListener('submit', onFormSubmit);
+// === Инициализация ===
+photoUploadFormElement.addEventListener('submit', handleFormSubmit);

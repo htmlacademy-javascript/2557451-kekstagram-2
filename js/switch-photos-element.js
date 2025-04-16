@@ -46,20 +46,12 @@ const renderPhotos = (filteredPhotos) => {
   initializeGallery(filteredPhotos);
 };
 
+// Дебаунс-версия отрисовки
+const debouncedRenderPhotos = debounce(renderPhotos, DEBOUNCE_DELAY);
+
 // Применение фильтра
 const applyFilter = (type) => {
-  const getFilteredPhotos = () => {
-    switch (type) {
-      case 'random':
-        return [...photos].sort(() => 0.5 - Math.random()).slice(0, RANDOM_PHOTO_COUNT);
-      case 'discussed':
-        return [...photos].sort((a, b) => b.comments.length - a.comments.length);
-      default:
-        return [...photos];
-    }
-  };
-
-  // Убираем активный класс у всех фильтров и добавляем к выбранному
+  // Активируем кнопку сразу (без задержки!)
   [FILTER_DEFAULT, FILTER_RANDOM, FILTER_DISCUSSED].forEach((btn) =>
     btn.classList.remove('img-filters__button--active')
   );
@@ -72,27 +64,34 @@ const applyFilter = (type) => {
 
   filterMap[type].classList.add('img-filters__button--active');
 
-  // Отложенная отрисовка с дебаунсом
-  debouncedRender(getFilteredPhotos());
-};
+  // Получаем нужные фото
+  let filteredPhotos;
+  switch (type) {
+    case 'random':
+      filteredPhotos = [...photos].sort(() => 0.5 - Math.random()).slice(0, RANDOM_PHOTO_COUNT);
+      break;
+    case 'discussed':
+      filteredPhotos = [...photos].sort((a, b) => b.comments.length - a.comments.length);
+      break;
+    default:
+      filteredPhotos = [...photos];
+  }
 
-// Функция с дебаунсом для отрисовки миниатюр
-const debouncedRender = debounce((filteredPhotos) => {
-  renderPhotos(filteredPhotos);
-}, DEBOUNCE_DELAY);
+  // Отрисовываем с задержкой
+  debouncedRenderPhotos(filteredPhotos);
+};
 
 // Инициализация фильтров
 const activateFilters = async () => {
   try {
-    photos = await loadPhotos(); // Загружаем фото
+    photos = await loadPhotos();
     FILTERS_CONTAINER.classList.remove('img-filters--inactive');
 
-    // Применяем фильтры по клику
     FILTER_DEFAULT.addEventListener('click', () => applyFilter('default'));
     FILTER_RANDOM.addEventListener('click', () => applyFilter('random'));
     FILTER_DISCUSSED.addEventListener('click', () => applyFilter('discussed'));
 
-    applyFilter('default'); // Применяем фильтр по умолчанию сразу
+    applyFilter('default');
   } catch (error) {
     console.error('Ошибка загрузки фотографий:', error);
   }

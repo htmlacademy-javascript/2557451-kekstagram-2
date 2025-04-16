@@ -6,6 +6,10 @@ import { uploadOverlay } from './image-upload-modal.js';
 const SUCCESS_MESSAGE_TEMPLATE = document.querySelector('#success').content.querySelector('.success');
 const ERROR_MESSAGE_TEMPLATE = document.querySelector('#error').content.querySelector('.error');
 const submitButton = document.querySelector('.img-upload__submit');
+const fileInput = document.querySelector('.img-upload__input');
+const hashtagInput = document.querySelector('.text__hashtags');
+const commentInput = document.querySelector('.text__description');
+
 const ESC_KEY = 'Escape';
 
 // === Управление кнопкой отправки ===
@@ -19,13 +23,27 @@ const enableSubmitButton = () => {
 
 // === Закрытие формы загрузки ===
 const closeUploadForm = () => {
-  photoUploadFormElement.reset();         // Сброс значений формы
-  pristineValidator.reset();              // Сброс валидации
-  uploadOverlay.classList.add('hidden');  // Скрытие модального окна
+  photoUploadFormElement.reset();               // Сброс значений формы
+  pristineValidator.reset();                    // Сброс валидации
+  uploadOverlay.classList.add('hidden');        // Скрытие модального окна
+  document.body.classList.remove('modal-open'); // Удаление класса
+  fileInput.value = '';                         // Очистка поля выбора файла
+  document.removeEventListener('keydown', onDocumentEscKeydown);
+};
+
+// === Обработчик ESC для закрытия формы (если фокус не в input/textarea) ===
+const onDocumentEscKeydown = (evt) => {
+  const activeElement = document.activeElement;
+  const isTextFieldFocused = activeElement === hashtagInput || activeElement === commentInput;
+
+  if (evt.key === ESC_KEY && !isTextFieldFocused) {
+    evt.preventDefault(); // Предотвращаем поведение по умолчанию
+    closeUploadForm();
+  }
 };
 
 // === Показ сообщения (успех или ошибка) ===
-const showMessage = (template) => {
+const showMessage = (template, shouldRestoreUpload = false) => {
   const message = template.cloneNode(true);
   document.body.appendChild(message);
 
@@ -34,6 +52,10 @@ const showMessage = (template) => {
     document.body.classList.remove('modal-open');
     document.removeEventListener('keydown', onEscPress);
     document.removeEventListener('click', onOutsideClick);
+
+    if (shouldRestoreUpload) {
+      uploadOverlay.classList.remove('hidden');
+    }
   };
 
   const onEscPress = (evt) => {
@@ -49,8 +71,6 @@ const showMessage = (template) => {
   if (closeButton) {
     closeButton.textContent = 'Close';
     closeButton.addEventListener('click', closeMessage);
-  } else {
-    console.warn('Кнопка закрытия не найдена в шаблоне сообщения!');
   }
 
   document.addEventListener('keydown', onEscPress);
@@ -82,11 +102,18 @@ const handleFormSubmit = async (evt) => {
     showMessage(SUCCESS_MESSAGE_TEMPLATE);
   } catch (error) {
     console.error('Ошибка при отправке:', error);
-    showMessage(ERROR_MESSAGE_TEMPLATE);
+    showMessage(ERROR_MESSAGE_TEMPLATE, true);
   } finally {
     enableSubmitButton();
   }
 };
+
+// === Открытие формы загрузки ===
+fileInput.addEventListener('change', () => {
+  uploadOverlay.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  document.addEventListener('keydown', onDocumentEscKeydown);
+});
 
 // === Инициализация ===
 photoUploadFormElement.addEventListener('submit', handleFormSubmit);

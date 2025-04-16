@@ -1,10 +1,8 @@
 import { loadPhotos } from './rendering-thumbnails.js';
 import { activateFilters } from './switch-photos-element.js';
 
-// === Константы ===
 const COMMENTS_PER_LOAD = 5;
 
-// === DOM-элементы ===
 const modalElement = document.querySelector('.big-picture');
 const closeButtonElement = document.querySelector('.big-picture__cancel');
 const imageElement = document.querySelector('.big-picture__img img');
@@ -16,18 +14,17 @@ const commentsContainerElement = document.querySelector('.social__comments');
 const commentsLoaderElement = document.querySelector('.comments-loader');
 const contentAreaElement = document.querySelector('.pictures');
 
-// === Переменные состояния ===
 let comments = [];
 let commentsShown = 0;
+let allPhotos = [];
 
-// === Обработка клавиши Escape ===
 const onDocumentKeydown = (evt) => {
   if (evt.key === 'Escape') {
+    evt.preventDefault();
     closeModal();
   }
 };
 
-// === Создание DOM-элемента комментария ===
 const createCommentElement = ({ avatar, name, message }) => {
   const comment = document.createElement('li');
   comment.classList.add('social__comment');
@@ -47,85 +44,93 @@ const createCommentElement = ({ avatar, name, message }) => {
   return comment;
 };
 
-// === Загрузка порции комментариев ===
-const loadMoreComments = () => {
-  const nextComments = comments.slice(commentsShown, commentsShown + COMMENTS_PER_LOAD);
-  commentsShown += nextComments.length;
-
-  const fragment = document.createDocumentFragment();
-  nextComments.forEach((comment) => {
-    fragment.append(createCommentElement(comment));
-  });
-
-  commentsContainerElement.append(fragment);
-  shownCommentsElement.textContent = commentsShown;
-  commentsLoaderElement.classList.toggle('hidden', commentsShown >= comments.length);
+const resetComments = () => {
+  commentsShown = 0;
+  commentsContainerElement.innerHTML = '';
+  shownCommentsElement.textContent = '0';
 };
 
-// === Открытие модального окна с изображением ===
+const renderComments = () => {
+  const nextBatchCount = Math.min(commentsShown + COMMENTS_PER_LOAD, comments.length);
+  const nextBatch = comments.slice(0, nextBatchCount);
+
+  const fragment = document.createDocumentFragment();
+
+  // Очистим старые комментарии
+  commentsContainerElement.innerHTML = '';
+
+  nextBatch.forEach((comment) => {
+    fragment.appendChild(createCommentElement(comment));
+  });
+
+  commentsContainerElement.appendChild(fragment);
+  commentsShown = nextBatch.length;
+
+  shownCommentsElement.textContent = commentsShown;
+  totalCommentsElement.textContent = comments.length;
+
+  if (commentsShown >= comments.length) {
+    commentsLoaderElement.classList.add('hidden');
+  } else {
+    commentsLoaderElement.classList.remove('hidden');
+  }
+};
+
 const openModal = (photo) => {
   const { url, description, likes, comments: photoComments } = photo;
 
   imageElement.src = url;
   imageElement.alt = description;
   likesElement.textContent = likes;
-  totalCommentsElement.textContent = photoComments.length;
   descriptionElement.textContent = description;
 
-  comments = photoComments;
-  commentsShown = 0;
-  commentsContainerElement.innerHTML = '';
-
-  loadMoreComments();
+  comments = photoComments.slice(); // копируем массив, чтобы не мутировать оригинал
+  resetComments();
+  renderComments();
 
   modalElement.classList.remove('hidden');
+  document.body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
-// === Закрытие модального окна ===
 const closeModal = () => {
   modalElement.classList.add('hidden');
+  document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
 };
 
-// === Обработка клика по миниатюре ===
 const onThumbnailClick = (evt) => {
   const pictureElement = evt.target.closest('.picture');
   if (!pictureElement) return;
 
   evt.preventDefault();
 
-  const pictureIndex = [...contentAreaElement.querySelectorAll('.picture')].indexOf(pictureElement);
-  if (pictureIndex === -1) return;
+  const pictureElements = [...contentAreaElement.querySelectorAll('.picture')];
+  const pictureIndex = pictureElements.indexOf(pictureElement);
 
-  openModal(window.photos[pictureIndex]);
+  if (pictureIndex !== -1 && allPhotos[pictureIndex]) {
+    openModal(allPhotos[pictureIndex]);
+  }
 };
 
-// === Инициализация галереи с фото ===
 const initializeGallery = (photos) => {
-  window.photos = photos; // Временно храним в глобальной переменной
+  allPhotos = photos;
   contentAreaElement.addEventListener('click', onThumbnailClick);
 };
 
-// === Обработка ошибки загрузки ===
 const handleLoadError = (error) => {
   console.error('Ошибка при загрузке фото:', error);
   showErrorMessage();
 };
 
-// === Показ сообщения об ошибке ===
 const showErrorMessage = () => {
   const template = document.querySelector('#data-error').content;
   const errorElement = template.cloneNode(true).firstElementChild;
 
   document.body.appendChild(errorElement);
-
-  setTimeout(() => {
-    errorElement.remove();
-  }, 5000);
+  setTimeout(() => errorElement.remove(), 5000);
 };
 
-// === Загрузка и инициализация ===
 loadPhotos()
   .then((photos) => {
     if (!photos || photos.length === 0) {
@@ -137,9 +142,13 @@ loadPhotos()
   })
   .catch(handleLoadError);
 
-// === Обработчики событий ===
+// === Обработчики ===
 closeButtonElement.addEventListener('click', closeModal);
-commentsLoaderElement.addEventListener('click', loadMoreComments);
+commentsLoaderElement.addEventListener('click', () => {
+  if (commentsShown < comments.length) {
+    renderComments();
+  }
+});
 
 // === Экспорт ===
 export { initializeGallery };

@@ -23,6 +23,7 @@ const loadPhotos = async () => {
     const photos = await response.json();
     return photos;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Ошибка при загрузке фотографий:', error);
     showErrorMessage();
     return [];

@@ -25,6 +25,20 @@ const onDocumentKeydown = (evt) => {
   }
 };
 
+const closeModal = () => {
+  modalElement.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDocumentKeydown);
+};
+
+const showErrorMessage = () => {
+  const template = document.querySelector('#data-error').content;
+  const errorElement = template.cloneNode(true).firstElementChild;
+
+  document.body.appendChild(errorElement);
+  setTimeout(() => errorElement.remove(), 5000);
+};
+
 const createCommentElement = ({ avatar, name, message }) => {
   const comment = document.createElement('li');
   comment.classList.add('social__comment');
@@ -92,12 +106,6 @@ const openModal = (photo) => {
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
-const closeModal = () => {
-  modalElement.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onDocumentKeydown);
-};
-
 const onThumbnailClick = (evt) => {
   const pictureElement = evt.target.closest('.picture');
   if (!pictureElement) {
@@ -119,19 +127,6 @@ const initializeGallery = (photos) => {
   contentAreaElement.addEventListener('click', onThumbnailClick);
 };
 
-const handleLoadError = (error) => {
-  console.error('Ошибка при загрузке фото:', error);
-  showErrorMessage();
-};
-
-const showErrorMessage = () => {
-  const template = document.querySelector('#data-error').content;
-  const errorElement = template.cloneNode(true).firstElementChild;
-
-  document.body.appendChild(errorElement);
-  setTimeout(() => errorElement.remove(), 5000);
-};
-
 loadPhotos()
   .then((photos) => {
     if (!photos || photos.length === 0) {
@@ -141,7 +136,9 @@ loadPhotos()
     initializeGallery(photos);
     activateFilters();
   })
-  .catch(handleLoadError);
+  .catch(() => {
+    showErrorMessage();
+  });
 
 closeButtonElement.addEventListener('click', closeModal);
 commentsLoaderElement.addEventListener('click', () => {

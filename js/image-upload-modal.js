@@ -19,6 +19,11 @@ const descriptionInput = document.querySelector('.text__description');
 
 let isInputFocused = false;
 
+const onEscapeKey = (evt) => {
+  if (evt.key === 'Escape' && !isInputFocused) {
+    closeModal();
+  }
+};
 
 const resetUploadForm = () => {
   fileInput.value = '';
@@ -63,12 +68,6 @@ const closeModal = () => {
   document.removeEventListener('keydown', onEscapeKey);
 };
 
-const onEscapeKey = (evt) => {
-  if (evt.key === 'Escape' && !isInputFocused) {
-    closeModal();
-  }
-};
-
 const openBigPictureModal = (pictureData) => {
   bigPictureOverlay.classList.remove('hidden');
   body.classList.add('modal-open');
@@ -93,7 +92,6 @@ const onThumbnailClick = (evt) => {
     openBigPictureModal(pictureData);
   }
 };
-
 
 fileInput.addEventListener('click', resetUploadForm);
 

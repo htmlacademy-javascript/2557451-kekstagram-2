@@ -18,15 +18,6 @@ const enableSubmitButton = () => {
   submitButton.disabled = false;
 };
 
-const closeUploadForm = () => {
-  photoUploadFormElement.reset();
-  pristineValidator.reset();
-  uploadOverlay.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-  fileInput.value = '';
-  document.removeEventListener('keydown', onDocumentEscKeydown);
-};
-
 const onDocumentEscKeydown = (evt) => {
   const activeElement = document.activeElement;
   const isTextFieldFocused = activeElement === hashtagInput || activeElement === commentInput;
@@ -35,6 +26,15 @@ const onDocumentEscKeydown = (evt) => {
     evt.preventDefault();
     closeUploadForm();
   }
+};
+
+const closeUploadForm = () => {
+  photoUploadFormElement.reset();
+  pristineValidator.reset();
+  uploadOverlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  fileInput.value = '';
+  document.removeEventListener('keydown', onDocumentEscKeydown);
 };
 
 const showMessage = (template, shouldRestoreUpload = false) => {
@@ -75,7 +75,6 @@ const showMessage = (template, shouldRestoreUpload = false) => {
   document.addEventListener('click', onOutsideClick);
 };
 
-// === Обработка отправки формы ===
 const handleFormSubmit = async (evt) => {
   evt.preventDefault();
 
@@ -95,25 +94,22 @@ const handleFormSubmit = async (evt) => {
     });
 
     if (!response.ok) {
-      throw new Error('Ошибка при отправке данных');
+      throw new Error();
     }
 
     closeUploadForm();
     showMessage(SUCCESS_MESSAGE_TEMPLATE);
-  } catch (error) {
-    console.error('Ошибка при отправке:', error);
+  } catch {
     showMessage(ERROR_MESSAGE_TEMPLATE, true);
   } finally {
     enableSubmitButton();
   }
 };
 
-// === Открытие формы загрузки ===
 fileInput.addEventListener('change', () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentEscKeydown);
 });
 
-// === Инициализация ===
 photoUploadFormElement.addEventListener('submit', handleFormSubmit);

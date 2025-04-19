@@ -84,6 +84,7 @@ const activateFilters = async () => {
 
     applyFilter('default');
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Ошибка загрузки фотографий:', error);
   }
 };

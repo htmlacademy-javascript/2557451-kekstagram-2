@@ -25,11 +25,11 @@ const onDocumentKeydown = (evt) => {
   }
 };
 
-const closeModal = () => {
+function closeModal () {
   modalElement.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
-};
+}
 
 const showErrorMessage = () => {
   const template = document.querySelector('#data-error').content;

@@ -47,7 +47,7 @@ const openUploadModal = (file) => {
   document.addEventListener('keydown', onEscapeKey);
 };
 
-const closeModal = () => {
+function closeModal () {
   if (uploadOverlay.classList.contains('hidden')) {
     return;
   }
@@ -66,7 +66,7 @@ const closeModal = () => {
   }
 
   document.removeEventListener('keydown', onEscapeKey);
-};
+}
 
 const openBigPictureModal = (pictureData) => {
   bigPictureOverlay.classList.remove('hidden');

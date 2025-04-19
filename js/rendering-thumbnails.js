@@ -1,9 +1,12 @@
 const ERROR_DISPLAY_TIMEOUT = 5000;
 const PHOTOS_API_URL = 'https://31.javascript.htmlacademy.pro/kekstagram/data';
 
-const showErrorMessage = () => {
+const showErrorMessage = (message) => {
   const errorTemplate = document.querySelector('#data-error').content;
   const errorElement = errorTemplate.cloneNode(true).firstElementChild;
+
+  const errorText = errorElement.querySelector('.error-text');
+  errorText.textContent = message || 'Произошла ошибка при загрузке данных';
 
   document.body.appendChild(errorElement);
 
@@ -23,9 +26,7 @@ const loadPhotos = async () => {
     const photos = await response.json();
     return photos;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Ошибка при загрузке фотографий:', error);
-    showErrorMessage();
+    showErrorMessage(error.message);
     return [];
   }
 };

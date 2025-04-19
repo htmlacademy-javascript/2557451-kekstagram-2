@@ -83,9 +83,8 @@ const activateFilters = async () => {
     FILTER_DISCUSSED.addEventListener('click', () => applyFilter('discussed'));
 
     applyFilter('default');
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Ошибка загрузки фотографий:', error);
+  } catch {
+    void 0;
   }
 };
 

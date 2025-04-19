@@ -19,11 +19,11 @@ const enableSubmitButton = () => {
 };
 
 const closeUploadForm = () => {
-  photoUploadFormElement.reset();           
-  pristineValidator.reset();                  
-  uploadOverlay.classList.add('hidden');       
-  document.body.classList.remove('modal-open'); 
-  fileInput.value = '';                         
+  photoUploadFormElement.reset();
+  pristineValidator.reset();
+  uploadOverlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  fileInput.value = '';
   document.removeEventListener('keydown', onDocumentEscKeydown);
 };
 
@@ -53,12 +53,16 @@ const showMessage = (template, shouldRestoreUpload = false) => {
   };
 
   const onEscPress = (evt) => {
-    if (evt.key === ESC_KEY) closeMessage();
+    if (evt.key === ESC_KEY) {
+      closeMessage();
+    }
   };
 
   const onOutsideClick = (evt) => {
     const innerBox = message.querySelector('div');
-    if (innerBox && !innerBox.contains(evt.target)) closeMessage();
+    if (innerBox && !innerBox.contains(evt.target)) {
+      closeMessage();
+    }
   };
 
   const closeButton = message.querySelector('button');
@@ -76,7 +80,9 @@ const handleFormSubmit = async (evt) => {
   evt.preventDefault();
 
   const isValid = pristineValidator.validate();
-  if (!isValid) return;
+  if (!isValid) {
+    return;
+  }
 
   disableSubmitButton();
 

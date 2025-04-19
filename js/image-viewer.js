@@ -100,7 +100,9 @@ const closeModal = () => {
 
 const onThumbnailClick = (evt) => {
   const pictureElement = evt.target.closest('.picture');
-  if (!pictureElement) return;
+  if (!pictureElement) {
+    return;
+  }
 
   evt.preventDefault();
 

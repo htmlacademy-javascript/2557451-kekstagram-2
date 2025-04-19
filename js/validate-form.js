@@ -12,24 +12,28 @@ const pristineValidator = new Pristine(photoUploadFormElement, {
   errorTextClass: 'img-upload__field-wrapper--error'
 });
 
-const extractHashtags = (value) => {
-  return value.trim().toLowerCase().split(/\s+/);
-};
+const extractHashtags = (value) => value.trim().toLowerCase().split(/\s+/);
 
 const validateHashtags = (value) => {
-  if (!value.trim()) return true;
+  if (!value.trim()) {
+    return true;
+  }
   const hashtags = extractHashtags(value);
   return hashtags.every((hashtag) => HASHTAG_PATTERN.test(hashtag));
 };
 
 const checkHashtagsCount = (value) => {
-  if (!value.trim()) return true;
+  if (!value.trim()) {
+    return true;
+  }
   const hashtags = extractHashtags(value);
   return hashtags.length <= MAX_TAGS_COUNT;
 };
 
 const checkUniqueHashtags = (value) => {
-  if (!value.trim()) return true;
+  if (!value.trim()) {
+    return true;
+  }
   const hashtags = extractHashtags(value);
   const uniqueHashtags = [...new Set(hashtags)];
   return hashtags.length === uniqueHashtags.length;

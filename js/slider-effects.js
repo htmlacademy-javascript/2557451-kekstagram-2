@@ -21,7 +21,9 @@ const sliderSettings = {
 };
 
 const updateSlider = (effect) => {
-  if (!sliderSettings[effect]) return;
+  if (!sliderSettings[effect]) {
+    return;
+  }
 
   sliderElement.noUiSlider.updateOptions({
     range: {

@@ -43,7 +43,9 @@ const openUploadModal = (file) => {
 };
 
 const closeModal = () => {
-  if (uploadOverlay.classList.contains('hidden')) return;
+  if (uploadOverlay.classList.contains('hidden')) {
+    return;
+  }
 
   uploadOverlay.classList.add('hidden');
   bigPictureOverlay?.classList.add('hidden');
@@ -97,15 +99,21 @@ fileInput.addEventListener('click', resetUploadForm);
 
 fileInput.addEventListener('change', (evt) => {
   const file = evt.target.files[0];
-  if (file) openUploadModal(file);
+  if (file) {
+    openUploadModal(file);
+  }
 });
 
 closeUploadButton.addEventListener('click', closeModal);
 closeBigPictureButton.addEventListener('click', closeModal);
 
 [hashtagInput, descriptionInput].forEach((input) => {
-  input?.addEventListener('focus', () => { isInputFocused = true; });
-  input?.addEventListener('blur', () => { isInputFocused = false; });
+  input?.addEventListener('focus', () => {
+    isInputFocused = true;
+  });
+  input?.addEventListener('blur', () => {
+    isInputFocused = false;
+  });
 });
 
 document.querySelectorAll('.picture-thumbnail').forEach((thumb) => {

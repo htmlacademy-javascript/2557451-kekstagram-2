@@ -27,19 +27,6 @@ const enableSubmitButton = () => {
   submitButton.disabled = false;
 };
 
-const onEscPress = (evt, message) => {
-  if (evt.key === ESC_KEY) {
-    closeMessage(message, false);
-  }
-};
-
-const onOutsideClick = (evt, message) => {
-  const innerBox = message.querySelector('div');
-  if (innerBox && !innerBox.contains(evt.target)) {
-    closeMessage(message, false);
-  }
-};
-
 function onDocumentEscKeydown(evt) {
   const activeElement = document.activeElement;
   const isTextFieldFocused = activeElement === hashtagInput || activeElement === commentInput;
@@ -50,11 +37,9 @@ function onDocumentEscKeydown(evt) {
   }
 }
 
-function closeMessage (message, shouldRestoreUpload) {
+function closeMessage(message, shouldRestoreUpload) {
   message.remove();
   document.body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onEscPress);
-  document.removeEventListener('click', onOutsideClick);
 
   if (shouldRestoreUpload) {
     uploadOverlay.classList.remove('hidden');
@@ -71,8 +56,25 @@ const showMessage = (template, shouldRestoreUpload = false) => {
     closeButton.addEventListener('click', () => closeMessage(message, shouldRestoreUpload));
   }
 
-  document.addEventListener('keydown', (evt) => onEscPress(evt, message));
-  document.addEventListener('click', (evt) => onOutsideClick(evt, message));
+  function escHandler(evt) {
+    if (evt.key === ESC_KEY) {
+      closeMessage(message, shouldRestoreUpload);
+      document.removeEventListener('keydown', escHandler);
+      document.removeEventListener('click', clickHandler);
+    }
+  }
+
+  function clickHandler(evt) {
+    const innerBox = message.querySelector('div');
+    if (innerBox && !innerBox.contains(evt.target)) {
+      closeMessage(message, shouldRestoreUpload);
+      document.removeEventListener('keydown', escHandler);
+      document.removeEventListener('click', clickHandler);
+    }
+  }
+
+  document.addEventListener('keydown', escHandler);
+  document.addEventListener('click', clickHandler);
 };
 
 const handleFormSubmit = async (evt) => {

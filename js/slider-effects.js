@@ -1,11 +1,9 @@
-// === DOM-элементы ===
 const sliderElement = document.querySelector('.effect-level__slider');
 const effectFieldElement = document.querySelector('.img-upload__effect-level');
 const effectRadios = document.querySelectorAll('.effects__radio');
 const applyingEffectImage = document.querySelector('.img-upload__preview img');
 const effectValueElement = document.querySelector('.effect-level__value');
 
-// === Фильтры ===
 const effectFilters = {
   chrome: (value) => `grayscale(${value})`,
   sepia: (value) => `sepia(${value})`,
@@ -14,7 +12,6 @@ const effectFilters = {
   heat: (value) => `brightness(${value})`,
 };
 
-// === Настройки слайдера ===
 const sliderSettings = {
   chrome: { min: 0, max: 1, step: 0.1, start: 1 },
   sepia: { min: 0, max: 1, step: 0.1, start: 1 },
@@ -23,7 +20,6 @@ const sliderSettings = {
   heat: { min: 1, max: 3, step: 0.1, start: 3 },
 };
 
-// === Обновление слайдера под выбранный эффект ===
 const updateSlider = (effect) => {
   if (!sliderSettings[effect]) return;
 
@@ -37,7 +33,6 @@ const updateSlider = (effect) => {
   });
 };
 
-// === Применение фильтра при изменении значения слайдера ===
 const onSliderUpdate = () => {
   const effect = document.querySelector('.effects__radio:checked')?.id.replace('effect-', '');
   const value = sliderElement.noUiSlider.get();
@@ -46,7 +41,6 @@ const onSliderUpdate = () => {
   effectValueElement.value = parseFloat(value); // Убираем лишние нули
 };
 
-// === Обработка смены эффекта ===
 const onEffectChange = (event) => {
   const effect = event.target.id.replace('effect-', '');
 
@@ -59,7 +53,6 @@ const onEffectChange = (event) => {
   }
 };
 
-// === Инициализация слайдера ===
 if (!sliderElement.noUiSlider) {
   noUiSlider.create(sliderElement, {
     range: { min: 0, max: 100 },
@@ -71,11 +64,9 @@ if (!sliderElement.noUiSlider) {
 
 effectFieldElement.classList.add('visually-hidden');
 
-// === Обработчики ===
 sliderElement.noUiSlider.on('update', onSliderUpdate);
 effectRadios.forEach((radio) => radio.addEventListener('change', onEffectChange));
 
-// === Сброс эффектов ===
 const resetEffects = () => {
   document.querySelector('#effect-none').checked = true;
   applyingEffectImage.style.filter = '';

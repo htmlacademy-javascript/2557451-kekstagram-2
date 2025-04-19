@@ -11,22 +11,19 @@ const RANDOM_PHOTO_COUNT = 10;
 const DEBOUNCE_DELAY = 500;
 
 let photos = [];
-let debounceTimer;
 
-// debounce-функция
 const debounce = (callback, delay) => {
+  let debounceTimer;
   return (...args) => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => callback(...args), delay);
   };
 };
 
-// Удаление всех миниатюр
 const clearPhotos = () => {
   CONTENT_AREA.querySelectorAll('.picture').forEach((image) => image.remove());
 };
 
-// Отрисовка миниатюр
 const renderPhotos = (filteredPhotos) => {
   clearPhotos();
 
@@ -46,12 +43,9 @@ const renderPhotos = (filteredPhotos) => {
   initializeGallery(filteredPhotos);
 };
 
-// Дебаунс-версия отрисовки
 const debouncedRenderPhotos = debounce(renderPhotos, DEBOUNCE_DELAY);
 
-// Применение фильтра
 const applyFilter = (type) => {
-  // Активируем кнопку сразу (без задержки!)
   [FILTER_DEFAULT, FILTER_RANDOM, FILTER_DISCUSSED].forEach((btn) =>
     btn.classList.remove('img-filters__button--active')
   );
@@ -64,7 +58,6 @@ const applyFilter = (type) => {
 
   filterMap[type].classList.add('img-filters__button--active');
 
-  // Получаем нужные фото
   let filteredPhotos;
   switch (type) {
     case 'random':
@@ -77,11 +70,9 @@ const applyFilter = (type) => {
       filteredPhotos = [...photos];
   }
 
-  // Отрисовываем с задержкой
   debouncedRenderPhotos(filteredPhotos);
 };
 
-// Инициализация фильтров
 const activateFilters = async () => {
   try {
     photos = await loadPhotos();

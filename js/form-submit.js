@@ -1,8 +1,6 @@
-// === Импорт зависимостей ===
 import { photoUploadFormElement, pristineValidator } from './validate-form.js';
 import { uploadOverlay } from './image-upload-modal.js';
 
-// === Константы ===
 const SUCCESS_MESSAGE_TEMPLATE = document.querySelector('#success').content.querySelector('.success');
 const ERROR_MESSAGE_TEMPLATE = document.querySelector('#error').content.querySelector('.error');
 const submitButton = document.querySelector('.img-upload__submit');
@@ -12,7 +10,6 @@ const commentInput = document.querySelector('.text__description');
 
 const ESC_KEY = 'Escape';
 
-// === Управление кнопкой отправки ===
 const disableSubmitButton = () => {
   submitButton.disabled = true;
 };
@@ -21,28 +18,25 @@ const enableSubmitButton = () => {
   submitButton.disabled = false;
 };
 
-// === Закрытие формы загрузки ===
 const closeUploadForm = () => {
-  photoUploadFormElement.reset();               // Сброс значений формы
-  pristineValidator.reset();                    // Сброс валидации
-  uploadOverlay.classList.add('hidden');        // Скрытие модального окна
-  document.body.classList.remove('modal-open'); // Удаление класса
-  fileInput.value = '';                         // Очистка поля выбора файла
+  photoUploadFormElement.reset();           
+  pristineValidator.reset();                  
+  uploadOverlay.classList.add('hidden');       
+  document.body.classList.remove('modal-open'); 
+  fileInput.value = '';                         
   document.removeEventListener('keydown', onDocumentEscKeydown);
 };
 
-// === Обработчик ESC для закрытия формы (если фокус не в input/textarea) ===
 const onDocumentEscKeydown = (evt) => {
   const activeElement = document.activeElement;
   const isTextFieldFocused = activeElement === hashtagInput || activeElement === commentInput;
 
   if (evt.key === ESC_KEY && !isTextFieldFocused) {
-    evt.preventDefault(); // Предотвращаем поведение по умолчанию
+    evt.preventDefault();
     closeUploadForm();
   }
 };
 
-// === Показ сообщения (успех или ошибка) ===
 const showMessage = (template, shouldRestoreUpload = false) => {
   const message = template.cloneNode(true);
   document.body.appendChild(message);

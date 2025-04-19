@@ -56,7 +56,6 @@ const renderComments = () => {
 
   const fragment = document.createDocumentFragment();
 
-  // Очистим старые комментарии
   commentsContainerElement.innerHTML = '';
 
   nextBatch.forEach((comment) => {
@@ -84,7 +83,7 @@ const openModal = (photo) => {
   likesElement.textContent = likes;
   descriptionElement.textContent = description;
 
-  comments = photoComments.slice(); // копируем массив, чтобы не мутировать оригинал
+  comments = photoComments.slice();
   resetComments();
   renderComments();
 
@@ -138,11 +137,10 @@ loadPhotos()
     }
 
     initializeGallery(photos);
-    activateFilters(photos);
+    activateFilters();
   })
   .catch(handleLoadError);
 
-// === Обработчики ===
 closeButtonElement.addEventListener('click', closeModal);
 commentsLoaderElement.addEventListener('click', () => {
   if (commentsShown < comments.length) {
@@ -150,5 +148,4 @@ commentsLoaderElement.addEventListener('click', () => {
   }
 });
 
-// === Экспорт ===
 export { initializeGallery };

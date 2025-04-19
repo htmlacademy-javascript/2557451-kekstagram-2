@@ -1,7 +1,6 @@
 const ERROR_DISPLAY_TIMEOUT = 5000;
 const PHOTOS_API_URL = 'https://31.javascript.htmlacademy.pro/kekstagram/data';
 
-// === Отображение сообщения об ошибке ===
 const showErrorMessage = () => {
   const errorTemplate = document.querySelector('#data-error').content;
   const errorElement = errorTemplate.cloneNode(true).firstElementChild;
@@ -13,7 +12,6 @@ const showErrorMessage = () => {
   }, ERROR_DISPLAY_TIMEOUT);
 };
 
-// === Загрузка фотографий с сервера ===
 const loadPhotos = async () => {
   try {
     const response = await fetch(PHOTOS_API_URL);

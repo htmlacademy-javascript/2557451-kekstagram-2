@@ -8,8 +8,6 @@ const showErrorMessage = (message) => {
   const errorText = errorElement.querySelector('.error-text');
   errorText.textContent = message || 'Произошла ошибка при загрузке данных';
 
-  document.body.appendChild(errorElement);
-
   setTimeout(() => {
     errorElement.remove();
   }, ERROR_DISPLAY_TIMEOUT);

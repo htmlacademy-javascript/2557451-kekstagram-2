@@ -1,7 +1,7 @@
 const sliderElement = document.querySelector('.effect-level__slider');
 const effectFieldElement = document.querySelector('.img-upload__effect-level');
-const effectRadios = document.querySelectorAll('.effects__radio');
-const applyingEffectImage = document.querySelector('.img-upload__preview img');
+const effectRadiosElements = document.querySelectorAll('.effects__radio');
+const applyingEffectImageElement = document.querySelector('.img-upload__preview img');
 const effectValueElement = document.querySelector('.effect-level__value');
 
 const effectFilters = {
@@ -39,15 +39,15 @@ const onSliderUpdate = () => {
   const effect = document.querySelector('.effects__radio:checked')?.id.replace('effect-', '');
   const value = sliderElement.noUiSlider.get();
 
-  applyingEffectImage.style.filter = effectFilters[effect]?.(value) || '';
-  effectValueElement.value = parseFloat(value); // Убираем лишние нули
+  applyingEffectImageElement.style.filter = effectFilters[effect]?.(value) || '';
+  effectValueElement.value = parseFloat(value);
 };
 
 const onEffectChange = (event) => {
   const effect = event.target.id.replace('effect-', '');
 
   if (effect === 'none') {
-    applyingEffectImage.style.filter = '';
+    applyingEffectImageElement.style.filter = '';
     effectFieldElement.classList.add('visually-hidden');
   } else {
     updateSlider(effect);
@@ -67,14 +67,15 @@ if (!sliderElement.noUiSlider) {
 effectFieldElement.classList.add('visually-hidden');
 
 sliderElement.noUiSlider.on('update', onSliderUpdate);
-effectRadios.forEach((radio) => radio.addEventListener('change', onEffectChange));
+effectRadiosElements.forEach((radio) => radio.addEventListener('change', onEffectChange));
 
 const resetEffects = () => {
   document.querySelector('#effect-none').checked = true;
-  applyingEffectImage.style.filter = '';
+  applyingEffectImageElement.style.filter = '';
+  applyingEffectImageElement.classList = ''
   effectFieldElement.classList.add('visually-hidden');
   sliderElement.noUiSlider.set(1);
   effectValueElement.value = '';
 };
 
-export { effectFieldElement, applyingEffectImage, resetEffects };
+export { effectFieldElement, applyingEffectImageElement, resetEffects };

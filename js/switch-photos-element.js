@@ -1,14 +1,15 @@
 import { loadPhotos } from './rendering-thumbnails.js';
 import { initializeGallery } from './image-viewer.js';
 
-const FILTERS_CONTAINER = document.querySelector('.img-filters');
-const FILTER_DEFAULT = FILTERS_CONTAINER.querySelector('#filter-default');
-const FILTER_RANDOM = FILTERS_CONTAINER.querySelector('#filter-random');
-const FILTER_DISCUSSED = FILTERS_CONTAINER.querySelector('#filter-discussed');
-const CONTENT_AREA = document.querySelector('.pictures');
-
 const RANDOM_PHOTO_COUNT = 10;
 const DEBOUNCE_DELAY = 500;
+
+const filtersContainerElement = document.querySelector('.img-filters');
+const filterDefaultElement = filtersContainerElement.querySelector('#filter-default');
+const filterRandomElement = filtersContainerElement.querySelector('#filter-random');
+const filterDiscussedElement = filtersContainerElement.querySelector('#filter-discussed');
+const contentAreaElement = document.querySelector('.pictures');
+const pictureTemplateElement = document.querySelector('#picture').content.querySelector('.picture');
 
 let photos = [];
 
@@ -21,17 +22,16 @@ const debounce = (callback, delay) => {
 };
 
 const clearPhotos = () => {
-  CONTENT_AREA.querySelectorAll('.picture').forEach((image) => image.remove());
+  contentAreaElement.querySelectorAll('.picture').forEach((image) => image.remove());
 };
 
 const renderPhotos = (filteredPhotos) => {
   clearPhotos();
 
-  const template = document.querySelector('#picture').content.querySelector('.picture');
   const fragment = document.createDocumentFragment();
 
   filteredPhotos.forEach(({ url, description, comments, likes }) => {
-    const element = template.cloneNode(true);
+    const element = pictureTemplateElement.cloneNode(true);
     element.querySelector('.picture__img').src = url;
     element.querySelector('.picture__img').alt = description;
     element.querySelector('.picture__comments').textContent = comments.length;
@@ -39,21 +39,21 @@ const renderPhotos = (filteredPhotos) => {
     fragment.appendChild(element);
   });
 
-  CONTENT_AREA.append(fragment);
+  contentAreaElement.append(fragment);
   initializeGallery(filteredPhotos);
 };
 
 const debouncedRenderPhotos = debounce(renderPhotos, DEBOUNCE_DELAY);
 
 const applyFilter = (type) => {
-  [FILTER_DEFAULT, FILTER_RANDOM, FILTER_DISCUSSED].forEach((btn) =>
+  [filterDefaultElement, filterRandomElement, filterDiscussedElement].forEach((btn) =>
     btn.classList.remove('img-filters__button--active')
   );
 
   const filterMap = {
-    default: FILTER_DEFAULT,
-    random: FILTER_RANDOM,
-    discussed: FILTER_DISCUSSED
+    default: filterDefaultElement,
+    random: filterRandomElement,
+    discussed: filterDiscussedElement
   };
 
   filterMap[type].classList.add('img-filters__button--active');
@@ -76,11 +76,11 @@ const applyFilter = (type) => {
 const activateFilters = async () => {
   try {
     photos = await loadPhotos();
-    FILTERS_CONTAINER.classList.remove('img-filters--inactive');
+    filtersContainerElement.classList.remove('img-filters--inactive');
 
-    FILTER_DEFAULT.addEventListener('click', () => applyFilter('default'));
-    FILTER_RANDOM.addEventListener('click', () => applyFilter('random'));
-    FILTER_DISCUSSED.addEventListener('click', () => applyFilter('discussed'));
+    filterDefaultElement.addEventListener('click', () => applyFilter('default'));
+    filterRandomElement.addEventListener('click', () => applyFilter('random'));
+    filterDiscussedElement.addEventListener('click', () => applyFilter('discussed'));
 
     applyFilter('default');
   } catch {

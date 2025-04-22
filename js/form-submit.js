@@ -1,39 +1,41 @@
 import { photoUploadFormElement, pristineValidator } from './validate-form.js';
-import { uploadOverlay } from './image-upload-modal.js';
-
-const SUCCESS_MESSAGE_TEMPLATE = document.querySelector('#success').content.querySelector('.success');
-const ERROR_MESSAGE_TEMPLATE = document.querySelector('#error').content.querySelector('.error');
-const submitButton = document.querySelector('.img-upload__submit');
-const fileInput = document.querySelector('.img-upload__input');
-const hashtagInput = document.querySelector('.text__hashtags');
-const commentInput = document.querySelector('.text__description');
+import { uploadOverlayElement } from './image-upload-modal.js';
+import { resetEffects } from './slider-effects.js';
 
 const ESC_KEY = 'Escape';
+
+const errorMessageTemplateElement = document.querySelector('#error').content.querySelector('.error');
+const successMessageTemplateElement = document.querySelector('#success').content.querySelector('.success');
+const submitButtonElement = document.querySelector('.img-upload__submit');
+const fileInputElement = document.querySelector('.img-upload__input');
+const hashtagInputElement = document.querySelector('.text__hashtags');
+const commentInputElement = document.querySelector('.text__description');
 
 const closeUploadForm = () => {
   photoUploadFormElement.reset();
   pristineValidator.reset();
-  uploadOverlay.classList.add('hidden');
+  uploadOverlayElement.classList.add('hidden');
   document.body.classList.remove('modal-open');
-  fileInput.value = '';
+  fileInputElement.value = '';
   document.removeEventListener('keydown', onDocumentEscKeydown);
 };
 
 const disableSubmitButton = () => {
-  submitButton.disabled = true;
+  submitButtonElement.disabled = true;
 };
 
 const enableSubmitButton = () => {
-  submitButton.disabled = false;
+  submitButtonElement.disabled = false;
 };
 
 function onDocumentEscKeydown(evt) {
   const activeElement = document.activeElement;
-  const isTextFieldFocused = activeElement === hashtagInput || activeElement === commentInput;
+  const isTextFieldFocused = activeElement === hashtagInputElement || activeElement === commentInputElement;
 
   if (evt.key === ESC_KEY && !isTextFieldFocused) {
     evt.preventDefault();
     closeUploadForm();
+    resetEffects();
   }
 }
 
@@ -42,7 +44,7 @@ function closeMessage(message, shouldRestoreUpload) {
   document.body.classList.remove('modal-open');
 
   if (shouldRestoreUpload) {
-    uploadOverlay.classList.remove('hidden');
+    uploadOverlayElement.classList.remove('hidden');
   }
 }
 
@@ -56,28 +58,28 @@ const showMessage = (template, shouldRestoreUpload = false) => {
     closeButton.addEventListener('click', () => closeMessage(message, shouldRestoreUpload));
   }
 
-  function escHandler(evt) {
+  function onEscapeKey(evt) {
     if (evt.key === ESC_KEY) {
       closeMessage(message, shouldRestoreUpload);
-      document.removeEventListener('keydown', escHandler);
-      document.removeEventListener('click', clickHandler);
+      document.removeEventListener('keydown', onEscapeKey);
+      document.removeEventListener('click', onOutsideClick);
     }
   }
 
-  function clickHandler(evt) {
+  function onOutsideClick(evt) {
     const innerBox = message.querySelector('div');
     if (innerBox && !innerBox.contains(evt.target)) {
       closeMessage(message, shouldRestoreUpload);
-      document.removeEventListener('keydown', escHandler);
-      document.removeEventListener('click', clickHandler);
+      document.removeEventListener('keydown', onEscapeKey);
+      document.removeEventListener('click', onOutsideClick);
     }
   }
 
-  document.addEventListener('keydown', escHandler);
-  document.addEventListener('click', clickHandler);
+  document.addEventListener('keydown', onEscapeKey);
+  document.addEventListener('click', onOutsideClick);
 };
 
-const handleFormSubmit = async (evt) => {
+const onFormSubmit = async (evt) => {
   evt.preventDefault();
 
   const isValid = pristineValidator.validate();
@@ -100,18 +102,18 @@ const handleFormSubmit = async (evt) => {
     }
 
     closeUploadForm();
-    showMessage(SUCCESS_MESSAGE_TEMPLATE);
+    showMessage(successMessageTemplateElement);
   } catch {
-    showMessage(ERROR_MESSAGE_TEMPLATE, true);
+    showMessage(errorMessageTemplateElement, true);
   } finally {
     enableSubmitButton();
   }
 };
 
-fileInput.addEventListener('change', () => {
-  uploadOverlay.classList.remove('hidden');
+fileInputElement.addEventListener('change', () => {
+  uploadOverlayElement.classList.remove('hidden');
   document.body.classList.add('modal-open');
   document.addEventListener('keydown', onDocumentEscKeydown);
 });
 
-photoUploadFormElement.addEventListener('submit', handleFormSubmit);
+photoUploadFormElement.addEventListener('submit', onFormSubmit);

@@ -21,11 +21,11 @@ let allPhotos = [];
 const onDocumentKeydown = (evt) => {
   if (evt.key === 'Escape') {
     evt.preventDefault();
-    closeModal();
+    onModalCloseClick();
   }
 };
 
-function closeModal () {
+function onModalCloseClick () {
   modalElement.classList.add('hidden');
   document.body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
@@ -66,18 +66,18 @@ const resetComments = () => {
 
 const renderComments = () => {
   const nextBatchCount = Math.min(commentsShown + COMMENTS_PER_LOAD, comments.length);
-  const nextBatch = comments.slice(0, nextBatchCount);
+  const nextBatches = comments.slice(0, nextBatchCount);
 
   const fragment = document.createDocumentFragment();
 
   commentsContainerElement.innerHTML = '';
 
-  nextBatch.forEach((comment) => {
+  nextBatches.forEach((comment) => {
     fragment.appendChild(createCommentElement(comment));
   });
 
   commentsContainerElement.appendChild(fragment);
-  commentsShown = nextBatch.length;
+  commentsShown = nextBatches.length;
 
   shownCommentsElement.textContent = commentsShown;
   totalCommentsElement.textContent = comments.length;
@@ -140,7 +140,7 @@ loadPhotos()
     showErrorMessage();
   });
 
-closeButtonElement.addEventListener('click', closeModal);
+closeButtonElement.addEventListener('click', onModalCloseClick);
 commentsLoaderElement.addEventListener('click', () => {
   if (commentsShown < comments.length) {
     renderComments();

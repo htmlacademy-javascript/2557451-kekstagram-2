@@ -14,6 +14,7 @@ const commentInputElement = document.querySelector('.text__description');
 const closeUploadForm = () => {
   photoUploadFormElement.reset();
   pristineValidator.reset();
+  resetEffects();
   uploadOverlayElement.classList.add('hidden');
   document.body.classList.remove('modal-open');
   fileInputElement.value = '';
@@ -35,7 +36,6 @@ function onDocumentEscKeydown(evt) {
   if (evt.key === ESC_KEY && !isTextFieldFocused) {
     evt.preventDefault();
     closeUploadForm();
-    resetEffects();
   }
 }
 

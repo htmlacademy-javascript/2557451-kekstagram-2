@@ -32,8 +32,9 @@ const enableSubmitButton = () => {
 function onDocumentEscKeydown(evt) {
   const activeElement = document.activeElement;
   const isTextFieldFocused = activeElement === hashtagInputElement || activeElement === commentInputElement;
+  const isErrorVisible = document.querySelector('.error') !== null;
 
-  if (evt.key === ESC_KEY && !isTextFieldFocused) {
+  if (evt.key === ESC_KEY && !isTextFieldFocused && !isErrorVisible) {
     evt.preventDefault();
     closeUploadForm();
   }

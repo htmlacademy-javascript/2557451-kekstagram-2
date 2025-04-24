@@ -4,10 +4,7 @@ import { effectFieldElement, applyingEffectImageElement, resetEffects } from './
 const fileInputElement = document.querySelector('.img-upload__input');
 const uploadOverlayElement = document.querySelector('.img-upload__overlay');
 const bodyElement = document.body;
-const closeUploadButtonElement = document.querySelector('.img-upload__cancel');
-const previewWrapperElement = document.querySelector('.img-upload__preview');
-const previewImageElement = previewWrapperElement.querySelector('img');
-const effectPreviewsElement = document.querySelectorAll('.effects__preview');
+
 const bigPictureOverlayElement = document.querySelector('.big-picture.overlay');
 const closeBigPictureButtonElement = document.querySelector('.big-picture__cancel');
 const hashtagInput = document.querySelector('.text__hashtags');
@@ -29,26 +26,11 @@ const onUploadFormReset = () => {
   resetEffects();
 };
 
-const openUploadModal = (file) => {
-  const imageUrl = URL.createObjectURL(file);
-
-  uploadOverlayElement.classList.remove('hidden');
-  bodyElement.classList.add('modal-open');
-  previewImageElement.src = imageUrl;
-
-  effectPreviewsElement.forEach((preview) => {
-    preview.style.backgroundImage = `url("${imageUrl}")`;
-  });
-
-  document.addEventListener('keydown', onEscapeKey);
-};
-
 function onModalCloseClick () {
   if (uploadOverlayElement.classList.contains('hidden')) {
     return;
   }
 
-  uploadOverlayElement.classList.add('hidden');
   bigPictureOverlayElement?.classList.add('hidden');
   bodyElement.classList.remove('modal-open');
 
@@ -60,7 +42,6 @@ function onModalCloseClick () {
     defaultEffect.checked = true;
     defaultEffect.focus();
   }
-
   document.removeEventListener('keydown', onEscapeKey);
 }
 
@@ -91,14 +72,6 @@ const onThumbnailClick = (evt) => {
 
 fileInputElement.addEventListener('click', onUploadFormReset);
 
-fileInputElement.addEventListener('change', (evt) => {
-  const file = evt.target.files[0];
-  if (file) {
-    openUploadModal(file);
-  }
-});
-
-closeUploadButtonElement.addEventListener('click', onModalCloseClick);
 closeBigPictureButtonElement.addEventListener('click', onModalCloseClick);
 
 [hashtagInput, descriptionInput].forEach((input) => {

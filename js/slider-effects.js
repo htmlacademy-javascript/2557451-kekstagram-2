@@ -72,7 +72,7 @@ effectRadiosElements.forEach((radio) => radio.addEventListener('change', onEffec
 const resetEffects = () => {
   document.querySelector('#effect-none').checked = true;
   applyingEffectImageElement.style.filter = '';
-  applyingEffectImageElement.classList = ''
+  applyingEffectImageElement.classList = '';
   effectFieldElement.classList.add('visually-hidden');
   sliderElement.noUiSlider.set(1);
   effectValueElement.value = '';

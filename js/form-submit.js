@@ -10,6 +10,11 @@ const submitButtonElement = document.querySelector('.img-upload__submit');
 const fileInputElement = document.querySelector('.img-upload__input');
 const hashtagInputElement = document.querySelector('.text__hashtags');
 const commentInputElement = document.querySelector('.text__description');
+const bodyElement = document.body;
+const previewWrapperElement = document.querySelector('.img-upload__preview');
+const previewImageElement = previewWrapperElement.querySelector('img');
+const effectPreviewsElement = document.querySelectorAll('.effects__preview');
+const closeUploadButtonElement = document.querySelector('.img-upload__cancel');
 
 const closeUploadForm = () => {
   photoUploadFormElement.reset();
@@ -20,6 +25,10 @@ const closeUploadForm = () => {
   fileInputElement.value = '';
   document.removeEventListener('keydown', onDocumentEscKeydown);
 };
+
+closeUploadButtonElement.addEventListener('click', () => {
+  closeUploadForm();
+});
 
 const disableSubmitButton = () => {
   submitButtonElement.disabled = true;
@@ -32,20 +41,16 @@ const enableSubmitButton = () => {
 function onDocumentEscKeydown(evt) {
   const activeElement = document.activeElement;
   const isTextFieldFocused = activeElement === hashtagInputElement || activeElement === commentInputElement;
+  const isErrorVisible = document.querySelector('.error');
 
-  if (evt.key === ESC_KEY && !isTextFieldFocused) {
+  if (evt.key === ESC_KEY && !isTextFieldFocused && !isErrorVisible) {
     evt.preventDefault();
     closeUploadForm();
   }
 }
 
-function closeMessage(message, shouldRestoreUpload) {
+function closeMessage(message) {
   message.remove();
-  document.body.classList.remove('modal-open');
-
-  if (shouldRestoreUpload) {
-    uploadOverlayElement.classList.remove('hidden');
-  }
 }
 
 const showMessage = (template, shouldRestoreUpload = false) => {
@@ -54,13 +59,12 @@ const showMessage = (template, shouldRestoreUpload = false) => {
 
   const closeButton = message.querySelector('button');
   if (closeButton) {
-    closeButton.textContent = 'Close';
-    closeButton.addEventListener('click', () => closeMessage(message, shouldRestoreUpload));
+    closeButton.addEventListener('click', () => closeMessage(message));
   }
 
   function onEscapeKey(evt) {
     if (evt.key === ESC_KEY) {
-      closeMessage(message, shouldRestoreUpload);
+      closeMessage(message);
       document.removeEventListener('keydown', onEscapeKey);
       document.removeEventListener('click', onOutsideClick);
     }
@@ -110,9 +114,23 @@ const onFormSubmit = async (evt) => {
   }
 };
 
-fileInputElement.addEventListener('change', () => {
+const openUploadModal = (file) => {
+  const imageUrl = URL.createObjectURL(file);
+
   uploadOverlayElement.classList.remove('hidden');
-  document.body.classList.add('modal-open');
+  bodyElement.classList.add('modal-open');
+  previewImageElement.src = imageUrl;
+
+  effectPreviewsElement.forEach((preview) => {
+    preview.style.backgroundImage = `url("${imageUrl}")`;
+  });
+};
+
+fileInputElement.addEventListener('change', (evt) => {
+  const file = evt.target.files[0];
+  if (file) {
+    openUploadModal(file);
+  }
   document.addEventListener('keydown', onDocumentEscKeydown);
 });
 

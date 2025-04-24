@@ -10,7 +10,6 @@ const submitButtonElement = document.querySelector('.img-upload__submit');
 const fileInputElement = document.querySelector('.img-upload__input');
 const hashtagInputElement = document.querySelector('.text__hashtags');
 const commentInputElement = document.querySelector('.text__description');
-const ErrorVisibleElement = document.querySelector('.error') !== null;
 
 const closeUploadForm = () => {
   photoUploadFormElement.reset();
@@ -33,8 +32,9 @@ const enableSubmitButton = () => {
 function onDocumentEscKeydown(evt) {
   const activeElement = document.activeElement;
   const isTextFieldFocused = activeElement === hashtagInputElement || activeElement === commentInputElement;
+  const isErrorVisible = document.querySelector('.error') !== null;
 
-  if (evt.key === ESC_KEY && !isTextFieldFocused && !ErrorVisibleElement) {
+  if (evt.key === ESC_KEY && !isTextFieldFocused && !isErrorVisible) {
     evt.preventDefault();
     closeUploadForm();
   }
